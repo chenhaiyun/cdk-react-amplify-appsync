@@ -7,24 +7,25 @@ import {
   aws_cloudfront as cloudfront,
   aws_s3_deployment as s3d,
   CfnOutput,
-  aws_appsync,
   Expiration,
   Duration
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import * as appsync from "@aws-cdk/aws-appsync-alpha";
 
 
 export class AppsyncCdkAppStack extends Construct {
+  readonly graphqlApi: appsync.GraphqlApi;
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
     // Creates the AppSync API
-    const api = new aws_appsync.GraphqlApi(this, 'Api', {
+    this.graphqlApi = new appsync.GraphqlApi(this, 'Api', {
       name: 'cdk-notes-appsync-api',
-      schema: aws_appsync.SchemaFile.fromAsset('backend/graphql/schema.graphql'),
+      schema: appsync.SchemaFile.fromAsset('backend/graphql/schema.graphql'),
       authorizationConfig: {
         defaultAuthorization: {
-          authorizationType: aws_appsync.AuthorizationType.API_KEY,
+          authorizationType: appsync.AuthorizationType.API_KEY,
           apiKeyConfig: {
             expires: Expiration.after(Duration.days(365))
           }
@@ -35,12 +36,12 @@ export class AppsyncCdkAppStack extends Construct {
 
     // Prints out the AppSync GraphQL endpoint to the terminal
     new CfnOutput(this, "GraphQLAPIURL", {
-     value: api.graphqlUrl
+     value:  this.graphqlApi.graphqlUrl
     });
 
     // Prints out the AppSync GraphQL API key to the terminal
     new CfnOutput(this, "GraphQLAPIKey", {
-      value: api.apiKey || ''
+      value:  this.graphqlApi.apiKey || ''
     });
 
     // Prints out the stack region to the terminal
