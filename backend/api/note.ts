@@ -45,8 +45,11 @@ export class NoteApiStack extends Construct {
       description: `${Aws.STACK_NAME} - AppSyncNote APIs Resolver`,
     });
 
+    // set table read write permission to lambda
+    this.noteTable.grantReadWriteData(noteHandler);
+
     // Add AppSyncNote lambda as a Datasource
-    const appPipeLambdaDS = props.graphqlApi.addLambdaDataSource(
+    const noteLambdaDS = props.graphqlApi.addLambdaDataSource(
       "AppSyncNoteLambdaDS",
       noteHandler,
       {
@@ -55,7 +58,7 @@ export class NoteApiStack extends Construct {
     );
 
     // Set resolver for releted appPipeline API methods
-    appPipeLambdaDS.createResolver("listNotes", {
+    noteLambdaDS.createResolver("listNotes", {
       typeName: "Query",
       fieldName: "listNotes",
       // requestMappingTemplate: appsync.MappingTemplate.fromFile(
@@ -73,13 +76,13 @@ export class NoteApiStack extends Construct {
     });
 
     // Set resolver for releted API methods
-    appPipeLambdaDS.createResolver("getNoteById", {
+    noteLambdaDS.createResolver("getNoteById", {
       typeName: "Query",
       fieldName: "getNoteById",
     });
 
     // Set resolver for releted API methods
-    appPipeLambdaDS.createResolver("createNote", {
+    noteLambdaDS.createResolver("createNote", {
       typeName: "Mutation",
       fieldName: "createNote",
     });

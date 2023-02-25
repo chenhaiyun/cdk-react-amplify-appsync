@@ -16,7 +16,7 @@ export class CodesStack extends cdk.Stack {
     const backendStack = new AppsyncCdkAppStack(this, "AppSyncStack");
 
     // Create the App Pipeline Appsync API stack
-    const appPipelineStack = new NoteApiStack(
+    const backendNoteStack = new NoteApiStack(
       this,
       'NoteStackApi',
       {
