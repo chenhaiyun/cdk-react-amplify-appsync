@@ -14,6 +14,7 @@ import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 
 export interface NoteProps {
   readonly graphqlApi: appsync.GraphqlApi;
+  readonly cognitoUserpool: any;
 }
 
 export class NoteApiStack extends Construct {

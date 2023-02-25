@@ -8,16 +8,27 @@ import {
   aws_s3_deployment as s3d,
   CfnOutput,
   Expiration,
-  Duration
+  Duration,
+  aws_cognito as cognito,
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as appsync from "@aws-cdk/aws-appsync-alpha";
 
+export interface AppSyncAPIProps {
+  readonly userPoolId: string;
+}
 
 export class AppsyncCdkAppStack extends Construct {
   readonly graphqlApi: appsync.GraphqlApi;
-  constructor(scope: Construct, id: string) {
+  constructor(scope: Construct, id: string, props: AppSyncAPIProps) {
     super(scope, id);
+
+    const userPool = cognito.UserPool.fromUserPoolId(
+      this,
+      "apiUserPool",
+      props.userPoolId
+    );
+
 
     // Creates the AppSync API
     this.graphqlApi = new appsync.GraphqlApi(this, 'Api', {
@@ -25,11 +36,17 @@ export class AppsyncCdkAppStack extends Construct {
       schema: appsync.SchemaFile.fromAsset('backend/graphql/schema.graphql'),
       authorizationConfig: {
         defaultAuthorization: {
+          authorizationType: appsync.AuthorizationType.USER_POOL,
+          userPoolConfig: {
+            userPool: userPool,
+          },
+        },
+        additionalAuthorizationModes: [{
           authorizationType: appsync.AuthorizationType.API_KEY,
           apiKeyConfig: {
             expires: Expiration.after(Duration.days(365))
           }
-        },
+        }],
       },
       xrayEnabled: true,
     });
