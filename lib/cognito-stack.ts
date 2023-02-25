@@ -11,7 +11,7 @@ export class CognitoCdkAppStack extends Construct {
 
     // Config the userPool
     this.cognitoUserPool = new cognito.UserPool(this, 'UserPool', {
-      userPoolName: 'NotesSampleUserPool',
+      userPoolName: 'NotesTestUserPool',
       selfSignUpEnabled: true,
       autoVerify: { email: true },
       standardAttributes: { email: { required: true } },
